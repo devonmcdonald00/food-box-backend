@@ -16,13 +16,13 @@ import java.util.Map;
 @RestController
 public class userController {
 
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "*")
 	@GetMapping("/")
 	public String greeting() {
 		return "hello world!";
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "*")
 	@GetMapping("/get_users")
 	public List<String> get_users() {
 		Connection c = null;
@@ -47,7 +47,7 @@ public class userController {
 		}
 	}
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "*")
 	@PostMapping("/user_exists")
     public boolean user_exists(@RequestBody Map<String, Object> payload) {
         System.out.println(payload);
@@ -75,8 +75,35 @@ public class userController {
         }
     }
 	
+	@CrossOrigin(origins = "*")
+	@PostMapping("/check_admin")
+    public boolean check_admin(@RequestBody Map<String, Object> payload) {
+        System.out.println(payload);
+        //System.out.println(payload.get("username"));
+        String username = payload.get("username").toString();
+        
+        Connection c = null;
+		Statement stmt = null;
+		
+        try {
+        	Class.forName("org.postgresql.Driver");
+        	c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox", "dummy", "123456");
+        	System.out.println("Opened database successfully");
+			stmt = c.createStatement();
+			String sql = "SELECT (admin) FROM users WHERE username='"+username+"'";
+			ResultSet rs = stmt.executeQuery(sql);
+			rs.next();
+			System.out.println(rs.getBoolean("admin"));
+			return rs.getBoolean("admin");
+        }
+        catch (Exception e) {
+        	System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        	return false;
+        }
+    }
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	
+	@CrossOrigin(origins = "*")
 	@PostMapping("/check_password")
     public boolean check_password(@RequestBody Map<String, Object> payload) {
         System.out.println(payload);
@@ -104,7 +131,7 @@ public class userController {
         }
     }
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = "*")
 	@PostMapping("/add_user")
     public boolean add_user(@RequestBody Map<String, Object> payload) {
         System.out.println(payload);
