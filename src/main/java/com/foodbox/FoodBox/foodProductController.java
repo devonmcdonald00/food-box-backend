@@ -67,6 +67,7 @@ public class foodProductController {
 				Cuisine newCuisine = new Cuisine();
 				newCuisine.setCuisine(rs.getString("cuisine"));
 				newCuisine.setEnabled(rs.getBoolean("enabled"));
+				newCuisine.setFlagImageURL(rs.getString("flag_image_url"));
 				cuisineList.add(newCuisine);
 			}
 			return cuisineList;
@@ -187,6 +188,7 @@ public class foodProductController {
 		
 		String cuisine = payload.get("cuisine").toString();
 		String enabled = payload.get("enabled").toString();
+		String flagImageURL = payload.get("flag_image_url").toString();
 		
 		Connection c = null;
 		Statement stmt = null;
@@ -196,7 +198,7 @@ public class foodProductController {
 			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
-			String sql = "INSERT INTO cuisines (cuisine, enabled) values ('" + cuisine + "', "+enabled+")";
+			String sql = "INSERT INTO cuisines (cuisine, enabled, flag_image_url) values ('" + cuisine + "', "+enabled+", '" + flagImageURL + "')";
 			boolean rs = stmt.execute(sql);
 			return !rs;
 		}
