@@ -61,7 +61,7 @@ public class foodProductController {
 			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
-			String sql = "SELECT * FROM cuisines";
+			String sql = "SELECT * FROM cuisines ORDER BY cuisine ASC";
 			ResultSet rs = stmt.executeQuery(sql);
 			while(rs.next()) {
 				Cuisine newCuisine = new Cuisine();
@@ -92,8 +92,10 @@ public class foodProductController {
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
 			String sql = "UPDATE cuisines SET enabled="+enabled+" WHERE cuisine='" + cuisine + "';";
+			String product_sql = "UPDATE food_products SET enabled="+ enabled +" WHERE cuisine='"+cuisine+"';";
 			boolean rs = stmt.execute(sql);
-			return !rs;
+			boolean product_rs = stmt.execute(product_sql);
+			return !rs && !product_rs;
 		}
 		catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -110,7 +112,6 @@ public class foodProductController {
 		String cuisine = payload.get("cuisine").toString();
 		String imageURL = payload.get("imageurl").toString();
 		String price = payload.get("price").toString();
-		String enabled = payload.get("enabled").toString();
 		Connection c = null;
 		Statement stmt = null;
 		
@@ -119,7 +120,30 @@ public class foodProductController {
 			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
-			String sql = "INSERT INTO food_products (name, price, cuisine, description, enabled, imageurl) values ('" + name + "', "+price+", '" + cuisine + "', '" + description + "', " + enabled + ", '" + imageURL + "')";
+			String sql = "INSERT INTO food_products (name, price, cuisine, description, enabled, imageurl) values ('" + name + "', "+price+", '" + cuisine + "', '" + description + "', true, '" + imageURL + "')";
+			boolean rs = stmt.execute(sql);
+			return !rs;
+		}
+		catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return false;
+		}
+	}
+	
+	@CrossOrigin(origins = "*")
+	@PostMapping("/delete_product")
+	public boolean delete_product(@RequestBody Map<String, Object> payload) {
+		
+		String name = payload.get("name").toString();
+		Connection c = null;
+		Statement stmt = null;
+		
+		try {
+			Class.forName("org.postgresql.Driver");
+			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
+			System.out.println("Opened database successfully");
+			stmt = c.createStatement();
+			String sql = "DELETE FROM food_products WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
 			return !rs;
 		}
@@ -173,6 +197,29 @@ public class foodProductController {
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
 			String sql = "INSERT INTO cuisines (cuisine, enabled) values ('" + cuisine + "', "+enabled+")";
+			boolean rs = stmt.execute(sql);
+			return !rs;
+		}
+		catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return false;
+		}
+	}
+	
+	@CrossOrigin(origins = "*")
+	@PostMapping("/delete_cuisine")
+	public boolean delete_cuisine(@RequestBody Map<String, Object> payload) {
+		
+		String cuisine = payload.get("cuisine").toString();
+		Connection c = null;
+		Statement stmt = null;
+		
+		try {
+			Class.forName("org.postgresql.Driver");
+			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
+			System.out.println("Opened database successfully");
+			stmt = c.createStatement();
+			String sql = "DELETE FROM cuisines WHERE cuisine='"+cuisine+"';";
 			boolean rs = stmt.execute(sql);
 			return !rs;
 		}
