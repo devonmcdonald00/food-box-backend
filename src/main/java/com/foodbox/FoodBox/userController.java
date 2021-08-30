@@ -31,7 +31,7 @@ public class userController {
 		
 		try {
 			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
+			c = DriverManager.getConnection("jdbc:postgresql://162.196.141.205:5432/foodbox","dummy", "123456");
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM users";
