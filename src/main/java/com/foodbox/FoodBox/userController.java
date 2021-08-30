@@ -28,7 +28,7 @@ public class userController {
 		Connection c = null;
 		Statement stmt = null;
 		List<String> userList = new ArrayList<String>();
-		
+		System.out.println("In here");
 		try {
 			Class.forName("org.postgresql.Driver");
 			c = DriverManager.getConnection("jdbc:postgresql://162.196.141.205:5432/foodbox","dummy", "123456");
