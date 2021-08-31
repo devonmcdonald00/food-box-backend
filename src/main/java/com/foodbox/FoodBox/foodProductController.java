@@ -50,6 +50,7 @@ public class foodProductController {
 				newProduct.setImageurl(rs.getString("imageurl"));
 				productList.add(newProduct);
 			}
+			c.close();
 			return productList;
 		}
 		catch (Exception e) {
@@ -77,6 +78,7 @@ public class foodProductController {
 				newCuisine.setFlagImageURL(rs.getString("flag_image_url"));
 				cuisineList.add(newCuisine);
 			}
+			c.close();
 			return cuisineList;
 		}
 		catch (Exception e) {
@@ -101,6 +103,7 @@ public class foodProductController {
 			String product_sql = "UPDATE food_products SET enabled="+ enabled +" WHERE cuisine='"+cuisine+"';";
 			boolean rs = stmt.execute(sql);
 			boolean product_rs = stmt.execute(product_sql);
+			c.close();
 			return !rs && !product_rs;
 		}
 		catch (Exception e) {
@@ -126,6 +129,7 @@ public class foodProductController {
 			stmt = c.createStatement();
 			String sql = "INSERT INTO food_products (name, price, cuisine, description, enabled, imageurl) values ('" + name + "', "+price+", '" + cuisine + "', '" + description + "', true, '" + imageURL + "')";
 			boolean rs = stmt.execute(sql);
+			c.close();
 			return !rs;
 		}
 		catch (Exception e) {
@@ -147,6 +151,7 @@ public class foodProductController {
 			stmt = c.createStatement();
 			String sql = "DELETE FROM food_products WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
+			c.close();
 			return !rs;
 		}
 		catch (Exception e) {
@@ -173,6 +178,7 @@ public class foodProductController {
 			stmt = c.createStatement();
 			String sql = "UPDATE food_products SET name='" + name + "', price="+price+", cuisine='" + cuisine + "', description='" + description + "', enabled=" + enabled + ", imageurl='" + imageURL + "' WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
+			c.close();
 			return !rs;
 		}
 		catch (Exception e) {
@@ -197,6 +203,7 @@ public class foodProductController {
 			stmt = c.createStatement();
 			String sql = "INSERT INTO cuisines (cuisine, enabled, flag_image_url) values ('" + cuisine + "', "+enabled+", '" + flagImageURL + "')";
 			boolean rs = stmt.execute(sql);
+			c.close();
 			return !rs;
 		}
 		catch (Exception e) {
@@ -218,6 +225,7 @@ public class foodProductController {
 			stmt = c.createStatement();
 			String sql = "DELETE FROM cuisines WHERE cuisine='"+cuisine+"';";
 			boolean rs = stmt.execute(sql);
+			c.close();
 			return !rs;
 		}
 		catch (Exception e) {

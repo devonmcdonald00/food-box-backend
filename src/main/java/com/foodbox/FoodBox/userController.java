@@ -37,6 +37,7 @@ public class userController {
 			while(rs.next()) {
 				userList.add(rs.getString("username"));
 			}
+			c.close();
 			return userList;
 		}
 		catch (Exception e) {
@@ -63,6 +64,7 @@ public class userController {
 			ResultSet rs = stmt.executeQuery(sql);
 			rs.next();
 			count = Integer.parseInt(rs.getString("count"));
+			c.close();
         	return count > 0;
         }
         catch (Exception e) {
@@ -88,6 +90,7 @@ public class userController {
 			ResultSet rs = stmt.executeQuery(sql);
 			rs.next();
 			System.out.println(rs.getBoolean("admin"));
+			c.close();
 			return rs.getBoolean("admin");
         }
         catch (Exception e) {
@@ -115,6 +118,7 @@ public class userController {
 			ResultSet rs = stmt.executeQuery(sql);
 			rs.next();
 			String dbPass = rs.getString("password");
+			c.close();
         	return dbPass.equals(password);
         }
         catch (Exception e) {
@@ -139,6 +143,7 @@ public class userController {
 			stmt = c.createStatement();
 			String sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
 			boolean status = stmt.execute(sql);
+			c.close();
         	return !status;
         }
         catch (Exception e) {
