@@ -21,34 +21,8 @@ import java.net.*;
 public class userController {
 	
 	@Autowired
-	private Connection c;
-
-	public Connection getC() {
-		return c;
-	}
-
-	private void setC(Connection c) {
-		this.c = c;
-	}
-
-	public userController() throws URISyntaxException {
-		Connection c = null;
-		URI dbUri = new URI(System.getenv("DATABASE_URL"));
-	    String username = dbUri.getUserInfo().split(":")[0];
-	    String password = dbUri.getUserInfo().split(":")[1];
-	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-	    try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection(dbUrl,username, password);
-			System.out.println("Opened database successfully");
-			setC(c);
-	    }
-	    catch (Exception e) {
-	    	System.err.println(e.getClass().getName() + ": " + e.getMessage());
-	    	setC(null);
-	    }
-	}
-
+	private DBRepository DBservice;
+	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/get_users")
 	public List<String> get_users() throws URISyntaxException {
@@ -56,7 +30,7 @@ public class userController {
 		Statement stmt = null;
 		List<String> userList = new ArrayList<String>();
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM users";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -83,7 +57,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = this.getC();
+        	c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT COUNT(username) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -108,7 +82,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = this.getC();
+        	c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT (admin) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -135,7 +109,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = this.getC();
+        	c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT (password) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -161,7 +135,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = this.getC();
+        	c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
 			boolean status = stmt.execute(sql);

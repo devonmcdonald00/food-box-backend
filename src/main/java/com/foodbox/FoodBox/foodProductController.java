@@ -5,8 +5,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,40 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
-@Component
 @RestController
 public class foodProductController {
 	
 	@Autowired
-	private Connection c;
-
-	public Connection getC() {
-		return c;
-	}
-
-	private void setC(Connection c) {
-		this.c = c;
-	}
-
-	public foodProductController() throws URISyntaxException {
-		Connection connection = null;
-		URI dbUri = new URI(System.getenv("DATABASE_URL"));
-	    String username = dbUri.getUserInfo().split(":")[0];
-	    String password = dbUri.getUserInfo().split(":")[1];
-	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-	    try {
-			Class.forName("org.postgresql.Driver");
-			connection = DriverManager.getConnection(dbUrl,username, password);
-			System.out.println("Opened database successfully");
-			setC(connection);
-	    }
-	    catch (Exception e) {
-	    	System.err.println(e.getClass().getName() + ": " + e.getMessage());
-	    	setC(null);
-	    }
-	}
+	private DBRepository DBservice;
 	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/get_products")
@@ -61,7 +35,7 @@ public class foodProductController {
 		List<Product> productList = new ArrayList<Product>();
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM food_products";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -92,7 +66,7 @@ public class foodProductController {
 		List<Cuisine> cuisineList = new ArrayList<Cuisine>();
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM cuisines ORDER BY cuisine ASC";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -121,7 +95,7 @@ public class foodProductController {
 		String enabled = payload.get("enabled").toString();
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "UPDATE cuisines SET enabled="+enabled+" WHERE cuisine='" + cuisine + "';";
 			String product_sql = "UPDATE food_products SET enabled="+ enabled +" WHERE cuisine='"+cuisine+"';";
@@ -148,7 +122,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO food_products (name, price, cuisine, description, enabled, imageurl) values ('" + name + "', "+price+", '" + cuisine + "', '" + description + "', true, '" + imageURL + "')";
 			boolean rs = stmt.execute(sql);
@@ -169,7 +143,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "DELETE FROM food_products WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
@@ -195,7 +169,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "UPDATE food_products SET name='" + name + "', price="+price+", cuisine='" + cuisine + "', description='" + description + "', enabled=" + enabled + ", imageurl='" + imageURL + "' WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
@@ -219,7 +193,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO cuisines (cuisine, enabled, flag_image_url) values ('" + cuisine + "', "+enabled+", '" + flagImageURL + "')";
 			boolean rs = stmt.execute(sql);
@@ -240,7 +214,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			c = this.getC();
+			c = DBservice.findAll().get(0).getDBConnection();
 			stmt = c.createStatement();
 			String sql = "DELETE FROM cuisines WHERE cuisine='"+cuisine+"';";
 			boolean rs = stmt.execute(sql);
