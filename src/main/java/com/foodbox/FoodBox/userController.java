@@ -16,11 +16,23 @@ import java.net.*;
 
 @RestController
 public class userController {
-
-	@CrossOrigin(origins = "*")
-	@GetMapping("/")
-	public String greeting() {
-		return "hello world!";
+	
+	private Connection connectToDB() throws URISyntaxException {
+		Connection c = null;
+		URI dbUri = new URI(System.getenv("DATABASE_URL"));
+	    String username = dbUri.getUserInfo().split(":")[0];
+	    String password = dbUri.getUserInfo().split(":")[1];
+	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+	    try {
+			Class.forName("org.postgresql.Driver");
+			c = DriverManager.getConnection(dbUrl,username, password);
+			System.out.println("Opened database successfully");
+			return c;
+	    }
+	    catch (Exception e) {
+	    	System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return null;
+	    }
 	}
 	
 	@CrossOrigin(origins = "*")
@@ -29,17 +41,8 @@ public class userController {
 		Connection c = null;
 		Statement stmt = null;
 		List<String> userList = new ArrayList<String>();
-		System.out.println("In here");
-		System.out.println(System.getenv("JDBC_DATABASE_URL"));
-		URI dbUri = new URI(System.getenv("DATABASE_URL"));
-	    String username = dbUri.getUserInfo().split(":")[0];
-	    String password = dbUri.getUserInfo().split(":")[1];
-	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-	    System.out.println(dbUrl);
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection(dbUrl,username, password);
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM users";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -66,9 +69,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	Class.forName("org.postgresql.Driver");
-        	c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox", "dummy", "123456");
-        	System.out.println("Opened database successfully");
+        	c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "SELECT COUNT(username) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -93,9 +94,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	Class.forName("org.postgresql.Driver");
-        	c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox", "dummy", "123456");
-        	System.out.println("Opened database successfully");
+        	c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "SELECT (admin) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -122,9 +121,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	Class.forName("org.postgresql.Driver");
-        	c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox", "dummy", "123456");
-        	System.out.println("Opened database successfully");
+        	c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "SELECT (password) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -150,9 +147,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	Class.forName("org.postgresql.Driver");
-        	c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox", "dummy", "123456");
-        	System.out.println("Opened database successfully");
+        	c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
 			boolean status = stmt.execute(sql);

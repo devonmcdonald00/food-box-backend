@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,6 +20,24 @@ import java.util.Map;
 @RestController
 public class foodProductController {
 	
+	private Connection connectToDB() throws URISyntaxException {
+		Connection c = null;
+		URI dbUri = new URI(System.getenv("DATABASE_URL"));
+	    String username = dbUri.getUserInfo().split(":")[0];
+	    String password = dbUri.getUserInfo().split(":")[1];
+	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+	    try {
+			Class.forName("org.postgresql.Driver");
+			c = DriverManager.getConnection(dbUrl,username, password);
+			System.out.println("Opened database successfully");
+			return c;
+	    }
+	    catch (Exception e) {
+	    	System.err.println(e.getClass().getName() + ": " + e.getMessage());
+			return null;
+	    }
+	}
+	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/get_products")
 	public List<Product> get_products() {
@@ -25,9 +46,7 @@ public class foodProductController {
 		List<Product> productList = new ArrayList<Product>();
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM food_products";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -57,9 +76,7 @@ public class foodProductController {
 		List<Cuisine> cuisineList = new ArrayList<Cuisine>();
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM cuisines ORDER BY cuisine ASC";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -88,9 +105,7 @@ public class foodProductController {
 		String enabled = payload.get("enabled").toString();
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "UPDATE cuisines SET enabled="+enabled+" WHERE cuisine='" + cuisine + "';";
 			String product_sql = "UPDATE food_products SET enabled="+ enabled +" WHERE cuisine='"+cuisine+"';";
@@ -117,9 +132,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO food_products (name, price, cuisine, description, enabled, imageurl) values ('" + name + "', "+price+", '" + cuisine + "', '" + description + "', true, '" + imageURL + "')";
 			boolean rs = stmt.execute(sql);
@@ -140,9 +153,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "DELETE FROM food_products WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
@@ -168,9 +179,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "UPDATE food_products SET name='" + name + "', price="+price+", cuisine='" + cuisine + "', description='" + description + "', enabled=" + enabled + ", imageurl='" + imageURL + "' WHERE name='"+name+"';";
 			boolean rs = stmt.execute(sql);
@@ -194,9 +203,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO cuisines (cuisine, enabled, flag_image_url) values ('" + cuisine + "', "+enabled+", '" + flagImageURL + "')";
 			boolean rs = stmt.execute(sql);
@@ -217,9 +224,7 @@ public class foodProductController {
 		Statement stmt = null;
 		
 		try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/foodbox","dummy", "123456");
-			System.out.println("Opened database successfully");
+			c = connectToDB();
 			stmt = c.createStatement();
 			String sql = "DELETE FROM cuisines WHERE cuisine='"+cuisine+"';";
 			boolean rs = stmt.execute(sql);
