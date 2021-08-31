@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.net.*;
 
 @RestController
 public class userController {
@@ -24,14 +25,20 @@ public class userController {
 	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/get_users")
-	public List<String> get_users() {
+	public List<String> get_users() throws URISyntaxException {
 		Connection c = null;
 		Statement stmt = null;
 		List<String> userList = new ArrayList<String>();
 		System.out.println("In here");
+		System.out.println(System.getenv("JDBC_DATABASE_URL"));
+		URI dbUri = new URI(System.getenv("DATABASE_URL"));
+	    String username = dbUri.getUserInfo().split(":")[0];
+	    String password = dbUri.getUserInfo().split(":")[1];
+	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+	    System.out.println(dbUrl);
 		try {
 			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection("jdbc:postgresql://162.196.141.205:5432/foodbox","dummy", "123456");
+			c = DriverManager.getConnection(dbUrl,username, password);
 			System.out.println("Opened database successfully");
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM users";
