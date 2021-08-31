@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 
+
 public class DBConnection {
 	private Connection c;
 	
@@ -16,15 +17,9 @@ public class DBConnection {
 		c = dBConnection;
 	}
 
-	public DBConnection() {
+	public DBConnection() throws URISyntaxException {
 		Connection c = null;
-		URI dbUri = null;
-		try {
-			dbUri = new URI(System.getenv("DATABASE_URL"));
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		URI dbUri = new URI(System.getenv("DATABASE_URL"));
 	    String username = dbUri.getUserInfo().split(":")[0];
 	    String password = dbUri.getUserInfo().split(":")[1];
 	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
