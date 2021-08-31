@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import java.sql.*;
 import java.sql.Connection;
@@ -17,23 +18,7 @@ import java.net.*;
 @RestController
 public class userController {
 	
-	private Connection connectToDB() throws URISyntaxException {
-		Connection c = null;
-		URI dbUri = new URI(System.getenv("DATABASE_URL"));
-	    String username = dbUri.getUserInfo().split(":")[0];
-	    String password = dbUri.getUserInfo().split(":")[1];
-	    String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-	    try {
-			Class.forName("org.postgresql.Driver");
-			c = DriverManager.getConnection(dbUrl,username, password);
-			System.out.println("Opened database successfully");
-			return c;
-	    }
-	    catch (Exception e) {
-	    	System.err.println(e.getClass().getName() + ": " + e.getMessage());
-			return null;
-	    }
-	}
+	private DBConnection c = new DBConnection();
 	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/get_users")
@@ -42,7 +27,7 @@ public class userController {
 		Statement stmt = null;
 		List<String> userList = new ArrayList<String>();
 		try {
-			c = connectToDB();
+			c = this.c.getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT * FROM users";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -69,7 +54,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = connectToDB();
+        	c = this.c.getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT COUNT(username) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -94,7 +79,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = connectToDB();
+        	c = this.c.getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT (admin) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -121,7 +106,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = connectToDB();
+        	c = this.c.getDBConnection();
 			stmt = c.createStatement();
 			String sql = "SELECT (password) FROM users WHERE username='"+username+"'";
 			ResultSet rs = stmt.executeQuery(sql);
@@ -147,7 +132,7 @@ public class userController {
 		Statement stmt = null;
 		
         try {
-        	c = connectToDB();
+        	c = this.c.getDBConnection();
 			stmt = c.createStatement();
 			String sql = "INSERT INTO users (username, password) VALUES ('" + username + "', '" + password + "')";
 			boolean status = stmt.execute(sql);
